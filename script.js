@@ -81,6 +81,7 @@ function initMap() {
 
     // Listen for messages from the parent iframe
     window.addEventListener("message", (event) => {
+        console.log("Received message from parent:", event.data);
         if (event.data.type === "load-markers") {
             const locations = event.data.locations; // Array of { lat, lng, label, ... }
             preloadMarkers(locations);
