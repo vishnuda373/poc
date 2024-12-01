@@ -157,7 +157,8 @@ document.getElementById("submit-location-btn").addEventListener("click", () => {
     }
 
     // Add the new location marker on the map
-    addMarker({ lat, lng, label: address });
+    const newLocation = { lat, lng, label: address };
+    addMarker(newLocation);
 
     // Send data to parent iframe
     const data = {
