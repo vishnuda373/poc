@@ -16,21 +16,76 @@
             width: 100%;
             height: 100%;
         }
-        #address-form {
+        #top-buttons {
+            position: absolute;
+            top: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 1000;
+        }
+        #top-buttons button {
+            margin: 5px;
+            padding: 10px 15px;
+            font-size: 14px;
+            cursor: pointer;
+            border: none;
+            border-radius: 5px;
+            background-color: #007BFF;
+            color: white;
+        }
+        #add-location-btn {
             position: absolute;
             top: 10px;
             left: 10px;
-            background: white;
-            padding: 10px;
-            border-radius: 8px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
             z-index: 1000;
+            padding: 10px 15px;
+            font-size: 14px;
+            cursor: pointer;
+            border: none;
+            border-radius: 5px;
+            background-color: #28a745;
+            color: white;
         }
-        #address-form input, #address-form button {
-            margin: 5px 0;
+        #add-location-form {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+            z-index: 2000;
+            display: none;
+        }
+        #add-location-form input, #add-location-form button {
+            margin: 10px 0;
             width: 100%;
             padding: 10px;
             box-sizing: border-box;
+        }
+        #add-location-form button {
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+        #add-location-form button.close-btn {
+            background-color: #dc3545;
+        }
+        #overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1500;
+            display: none;
+        }
+        .pac-container {
+            z-index: 9999 !important;
         }
     </style>
     <script src="script.js" defer></script>
@@ -38,9 +93,24 @@
 </head>
 <body>
     <div id="map"></div>
-    <div id="address-form">
-        <input type="text" id="input-address" placeholder="Enter Address">
-        <button id="submit-btn">Submit Address</button>
+    <div id="top-buttons">
+        <button id="visited-property-btn">Visited Property</button>
+        <button id="planned-visits-btn">Planned Visits</button>
+    </div>
+    <button id="add-location-btn">Add Location</button>
+    <div id="overlay"></div>
+    <div id="add-location-form">
+        <input type="hidden" id="latitude">
+        <input type="hidden" id="longitude">
+        <input type="text" id="address" placeholder="Enter Address">
+        <input type="text" id="address-line-1" placeholder="Address Line 1">
+        <input type="text" id="address-line-2" placeholder="Address Line 2">
+        <input type="text" id="city" placeholder="City">
+        <input type="text" id="state" placeholder="State">
+        <input type="text" id="country" placeholder="Country">
+        <input type="text" id="pincode" placeholder="Pincode">
+        <button id="submit-location-btn">Submit Location</button>
+        <button class="close-btn">Close</button>
     </div>
 </body>
 </html>
