@@ -1,5 +1,7 @@
+let map, autocomplete, geocoder, markers = [];
+
 function initMap() {
-    const location = { lat: 9.9312, lng: 76.2673 }; // Example location
+    const location = { lat: 9.9312, lng: 76.2673 }; // Example default location
     map = new google.maps.Map(document.getElementById("map"), {
         center: location,
         zoom: 12,
@@ -19,7 +21,7 @@ function initMap() {
     autocomplete.addListener("place_changed", () => {
         const place = autocomplete.getPlace();
         if (!place.geometry) {
-            // alert("No details available for the selected place.");
+            alert("No details available for the selected place.");
             return;
         }
 
@@ -72,32 +74,53 @@ function initMap() {
                 document.getElementById("add-location-form").style.display = "block";
                 document.getElementById("overlay").style.display = "block";
             } else {
-                // alert("Unable to get address for the clicked location.");
+                alert("Unable to get address for the clicked location.");
             }
         });
     });
 
-    // Add a listener for manual address input when no suggestions are available
-    document.getElementById("address").addEventListener("blur", () => {
-        const manualAddress = document.getElementById("address").value;
-
-        if (manualAddress) {
-            geocoder.geocode({ address: manualAddress }, (results, status) => {
-                if (status === "OK" && results[0]) {
-                    const address = results[0];
-                    const location = address.geometry.location;
-
-                    document.getElementById("latitude").value = location.lat();
-                    document.getElementById("longitude").value = location.lng();
-
-                    // Populate the address fields
-                    populateAddressFields(address.address_components);
-                } else {
-                    // alert("Could not find details for the entered address. Please check the address and try again.");
-                }
-            });
+    // Listen for messages from the parent iframe
+    window.addEventListener("message", (event) => {
+        if (event.data.type === "load-markers") {
+            const locations = event.data.locations; // Array of { lat, lng, label, ... }
+            preloadMarkers(locations);
         }
     });
+}
+
+// Function to preload markers on the map
+function preloadMarkers(locations) {
+    clearMarkers(); // Clear existing markers
+    locations.forEach(location => {
+        const marker = new google.maps.Marker({
+            position: { lat: location.lat, lng: location.lng },
+            map: map,
+            title: location.label || "Marker",
+        });
+        markers.push(marker);
+
+        // Optional: Add an info window to display marker details
+        const infoWindow = new google.maps.InfoWindow({
+            content: `<p><strong>${location.label || "Marker"}</strong></p><p>Latitude: ${location.lat}</p><p>Longitude: ${location.lng}</p>`,
+        });
+
+        marker.addListener("click", () => {
+            infoWindow.open(map, marker);
+        });
+    });
+
+    // Adjust map bounds to fit all markers
+    if (locations.length > 0) {
+        const bounds = new google.maps.LatLngBounds();
+        locations.forEach(location => bounds.extend({ lat: location.lat, lng: location.lng }));
+        map.fitBounds(bounds);
+    }
+}
+
+// Function to clear existing markers from the map
+function clearMarkers() {
+    markers.forEach(marker => marker.setMap(null));
+    markers = [];
 }
 
 // Function to populate address fields
