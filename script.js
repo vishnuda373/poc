@@ -81,7 +81,6 @@ function initMap() {
 
     // Listen for messages from the parent iframe
     window.addEventListener("message", (event) => {
-        console.log("Received message from parent:", event.data);
         if (event.data.type === "load-markers") {
             const locations = event.data.locations; // Array of { lat, lng, label, ... }
             preloadMarkers(locations);
@@ -92,30 +91,26 @@ function initMap() {
 // Function to preload markers on the map
 function preloadMarkers(locations) {
     clearMarkers(); // Clear existing markers
-    locations.forEach(location => {
-        const marker = new google.maps.Marker({
-            position: { lat: location.lat, lng: location.lng },
-            map: map,
-            title: location.label || "Marker",
-        });
-        markers.push(marker);
+    locations.forEach(location => addMarker(location));
+}
 
-        // Optional: Add an info window to display marker details
-        const infoWindow = new google.maps.InfoWindow({
-            content: `<p><strong>${location.label || "Marker"}</strong></p><p>Latitude: ${location.lat}</p><p>Longitude: ${location.lng}</p>`,
-        });
+// Function to add a single marker to the map
+function addMarker(location) {
+    const marker = new google.maps.Marker({
+        position: { lat: location.lat, lng: location.lng },
+        map: map,
+        title: location.label || "Marker",
+    });
+    markers.push(marker);
 
-        marker.addListener("click", () => {
-            infoWindow.open(map, marker);
-        });
+    // Optional: Add an info window to display marker details
+    const infoWindow = new google.maps.InfoWindow({
+        content: `<p><strong>${location.label || "Marker"}</strong></p><p>Latitude: ${location.lat}</p><p>Longitude: ${location.lng}</p>`,
     });
 
-    // Adjust map bounds to fit all markers
-    if (locations.length > 0) {
-        const bounds = new google.maps.LatLngBounds();
-        locations.forEach(location => bounds.extend({ lat: location.lat, lng: location.lng }));
-        map.fitBounds(bounds);
-    }
+    marker.addListener("click", () => {
+        infoWindow.open(map, marker);
+    });
 }
 
 // Function to clear existing markers from the map
@@ -160,6 +155,9 @@ document.getElementById("submit-location-btn").addEventListener("click", () => {
         alert("Please provide a valid address.");
         return;
     }
+
+    // Add the new location marker on the map
+    addMarker({ lat, lng, label: address });
 
     // Send data to parent iframe
     const data = {
